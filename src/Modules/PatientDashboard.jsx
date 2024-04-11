@@ -101,17 +101,11 @@ export default function PatientDashboard() {
     };
 
     return (
-        <div className="mx-auto mt-8 p-6 rounded-md">
+        <div className="mx-auto mt-8 px-6 py-0 rounded-md">
             <h2 className="text-2xl font-semibold mb-4 text-blue-700">Patient Dashboard</h2>
             <div className="mb-6">
                 <div className="flex justify-between mb-4">
                     <h3 className="text-lg font-medium text-blue-600">Patient Details <FaUserEdit /></h3>
-                    {/* <Link
-                        to="/edit-profile"
-                        className="text-blue-500 hover:text-blue-700"
-                    >
-                        Edit Profile
-                    </Link> */}
                 </div>
                 <div className="grid grid-cols-2 gap-y-2">
                     <div>
@@ -135,15 +129,15 @@ export default function PatientDashboard() {
             <div className="mb-6">
                 <h3 className="text-lg font-medium mb-4">Daily Information</h3>
                 <div className="flex flex-col justify-between">
-                    <div className="flex items-center mb-2"><FaHeartbeat /> Pulse Rate: {patientData.pulseRate}</div>
-                    <div className="flex items-center mb-2"><FaThermometerHalf /> Blood Pressure: {patientData.bloodPressure}</div>
-                    <div className="flex items-center mb-2"><FaWeight /> Weight: {patientData.weight}</div>
-                    <div className="flex items-center mb-2"><FaThermometerHalf /> Temperature: {patientData.temperature}</div>
-                    <div className="flex items-center mb-2"><FaLungs /> Respiratory Rate: {patientData.respiratoryRate}</div>
+                    <div className="flex items-center mb-2"><FaHeartbeat />  Pulse Rate: {patientData.pulseRate}</div>
+                    <div className="flex items-center mb-2"><FaThermometerHalf />  Blood Pressure: {patientData.bloodPressure}</div>
+                    <div className="flex items-center mb-2"><FaWeight />  Weight: {patientData.weight}</div>
+                    <div className="flex items-center mb-2"><FaThermometerHalf />  Temperature: {patientData.temperature}</div>
+                    <div className="flex items-center mb-2"><FaLungs />  Respiratory Rate: {patientData.respiratoryRate}</div>
                 </div>
             </div>
             <div className="mb-6">
-                <h3 className="text-lg font-medium mb-2">Symptoms <FaNotesMedical /></h3>
+                <h3 className="text-lg font-medium mb-2">Symptoms<FaNotesMedical /></h3>
                 <p>{patientData.symptoms}</p>
             </div>
             <div className="flex justify-between mt-6">
@@ -160,6 +154,7 @@ export default function PatientDashboard() {
                     Log Symptoms
                 </Link>
             </div>
+            <br></br>
         </div>
     );
 }

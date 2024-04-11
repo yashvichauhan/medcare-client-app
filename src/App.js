@@ -8,6 +8,7 @@ import RecordVisitForm from './Modules/RecordVisitForm';
 import PatientDashboard from './Modules/PatientDashboard';
 import DailyInformationForm from './Modules/DailyInformationForm';
 import SymptomChecklistForm from './Modules/SymptomsChecklistForm';
+import PreviousVisitsPage from './Modules/PreviousVisitData';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/daily-information" element={<DailyInformationForm/>} />
         <Route path="/patient-dashboard" element={<PatientDashboard/>} />
         <Route path="/symptom-checklist" element={<SymptomChecklistForm/>} />
+        <Route path="/previous-visit" element={<PreviousVisitsPage/>} />
     </Routes>
   );
 }
