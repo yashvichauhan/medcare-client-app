@@ -1,6 +1,40 @@
-import React from "react";
+import React, {useState} from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function SignIn(){
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const navigate = useNavigate();
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await axios.post("http://localhost:4000/api/auth/login", {
+                email,
+                password
+            });
+            console.log("Login successful:", response.data);
+            
+            const { roleId } = response.data;
+
+            switch (roleId) {
+                case "nurse":
+                    navigate("/nurse-dashboard");
+                    break;
+                case "patient":
+                    navigate("/patient-dashboard");
+                    break;
+                default:
+                    console.error("Invalid role ID:", roleId);
+            }
+        } catch (error) {
+        // Handle login error
+        console.error("Login error:", error.response.data.message);
+        }
+    }
+
     return(
         <>
             <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -16,7 +50,7 @@ export default function SignIn(){
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form className="space-y-6" action="#" method="POST">
+            <form className="space-y-6" action="#" method="POST" onSubmit={handleSubmit}>
                 <div>
                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                     Email address
@@ -29,6 +63,8 @@ export default function SignIn(){
                     autoComplete="email"
                     required
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
                 </div>
@@ -52,6 +88,8 @@ export default function SignIn(){
                     autoComplete="current-password"
                     required
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
                 </div>

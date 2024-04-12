@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { MdCheckBoxOutlineBlank, MdCheckBox } from "react-icons/md"; // Import MD icons
+import { useNavigate } from "react-router-dom";
 
 export default function SymptomChecklistForm() {
     // State variable to store selected symptoms
     const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+
+    const navigate = useNavigate();
 
     // Dummy list of common signs and symptoms (for demonstration)
     const commonSymptoms = [
@@ -34,6 +37,7 @@ export default function SymptomChecklistForm() {
         event.preventDefault();
         // You can perform further actions here, such as sending the selected symptoms to a server
         console.log("Selected symptoms:", selectedSymptoms);
+        navigate("/patient-dashboard"); // Redirect to the patient dashboard after submission
         // Reset selected symptoms after submission
         setSelectedSymptoms([]);
     };
@@ -46,19 +50,22 @@ export default function SymptomChecklistForm() {
             <form onSubmit={handleSubmit}>
                 {commonSymptoms.map((symptom, index) => (
                     <div key={index} className="flex items-center mb-3">
+                        <label htmlFor={`symptom-${index}`}>
                         {selectedSymptoms.includes(symptom) ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
+                        </label>
                         <input
-                            type="checkbox"
-                            id={`symptom-${index}`}
-                            value={symptom}
-                            checked={selectedSymptoms.includes(symptom)}
-                            onChange={() => handleToggleSymptom(symptom)}
-                            className="mr-3"
-                            style={{ display: "none" }} // Hide the default checkbox
+                        type="checkbox"
+                        id={`symptom-${index}`}
+                        value={symptom}
+                        checked={selectedSymptoms.includes(symptom)}
+                        onChange={() => handleToggleSymptom(symptom)}
+                        className="mr-3"
+                        style={{ display: "none" }} // Hide the default checkbox
                         />
                         <label htmlFor={`symptom-${index}`} className="text-sm font-medium text-gray-700">{symptom}</label>
                     </div>
                 ))}
+
                 <div className="mt-4">
                     <button
                         type="submit"
