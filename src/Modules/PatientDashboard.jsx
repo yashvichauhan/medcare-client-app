@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FaUserEdit,
@@ -15,6 +15,7 @@ import Header from "./Header";
 
 export default function PatientDashboard() {
   const { loginData } = useContext(AuthContext);
+  const [lastSymptoms, setLastSymptoms] = useState([]);
   const GET_DAILY_INFO = gql`
     query GetDailyInfoByPatientId($patientId: String!) {
       getDailyInfoByPatientId(patientId: $patientId) {
@@ -27,14 +28,43 @@ export default function PatientDashboard() {
       }
     }
   `;
+  const GET_SYMPTOMS_BY_PATIENT_ID = gql`
+    query GetSymptomsByPatientId($patientId: String!) {
+      getSymptomsByPatientId(patientId: $patientId) {
+        id
+        patientId
+        symptomsList
+      }
+    }
+  `;
 
   const { loading, error, data, refetch } = useQuery(GET_DAILY_INFO, {
     variables: { patientId: loginData.id }, // Pass the id variable here
   });
 
-  useEffect(()=> {
+  const { loading: symLoading, error: symError, data: symptomData, refetch: refetchSymptom } = useQuery(
+    GET_SYMPTOMS_BY_PATIENT_ID,
+    {
+      variables: { patientId: loginData.id },
+    }
+  );
+
+  useEffect(() => {
     refetch();
-  },[loginData])
+    refetchSymptom();
+  }, [loginData]);
+
+  useEffect(() => {
+    // Set last symptoms when data changes
+    console.log(symptomData)
+    if (symptomData && symptomData.getSymptomsByPatientId) {
+      const symptoms = symptomData.getSymptomsByPatientId;
+      if (symptoms.length > 0) {
+        const lastSymptom = symptoms[symptoms.length - 1];
+        setLastSymptoms(lastSymptom.symptomsList);
+      }
+    }
+  }, [symptomData]);
 
   return (
     <div className="bg-white">
@@ -70,36 +100,48 @@ export default function PatientDashboard() {
             </div>
           )}
         </div>
-        {loading && (
-            <p> Fetching Daily Info</p>
-        )}{(data && data.getDailyInfoByPatientId && data.getDailyInfoByPatientId.length!==0) && (
+        {loading && <p> Fetching Daily Info</p>}
+        {data &&
+          data.getDailyInfoByPatientId &&
+          data.getDailyInfoByPatientId.length !== 0 && (
             <div className="mb-6">
-            <h3 className="text-lg font-medium mb-4">Daily Information</h3>
-            <div className="flex flex-col justify-between">
-              <div className="flex items-center mb-2">
-                <FaHeartbeat /> Pulse Rate: {data.getDailyInfoByPatientId[0].pulseRate}
-              </div>
-              <div className="flex items-center mb-2">
-                <FaThermometerHalf /> Blood Pressure: {data.getDailyInfoByPatientId[0].bloodPressure}
-              </div>
-              <div className="flex items-center mb-2">
-                <FaWeight /> Weight: {data.getDailyInfoByPatientId[0].weight}
-              </div>
-              <div className="flex items-center mb-2">
-                <FaThermometerHalf /> Temperature: {data.getDailyInfoByPatientId[0].temperature}
-              </div>
-              <div className="flex items-center mb-2">
-                <FaLungs /> Respiratory Rate: {data.getDailyInfoByPatientId[0].respiratoryRate}
+              <h3 className="text-lg font-medium mb-4">Daily Information</h3>
+              <div className="flex flex-col justify-between">
+                <div className="flex items-center mb-2">
+                  <FaHeartbeat /> Pulse Rate:{" "}
+                  {data.getDailyInfoByPatientId[0].pulseRate}
+                </div>
+                <div className="flex items-center mb-2">
+                  <FaThermometerHalf /> Blood Pressure:{" "}
+                  {data.getDailyInfoByPatientId[0].bloodPressure}
+                </div>
+                <div className="flex items-center mb-2">
+                  <FaWeight /> Weight: {data.getDailyInfoByPatientId[0].weight}
+                </div>
+                <div className="flex items-center mb-2">
+                  <FaThermometerHalf /> Temperature:{" "}
+                  {data.getDailyInfoByPatientId[0].temperature}
+                </div>
+                <div className="flex items-center mb-2">
+                  <FaLungs /> Respiratory Rate:{" "}
+                  {data.getDailyInfoByPatientId[0].respiratoryRate}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
         <div className="mb-6">
-          <h3 className="text-lg font-medium mb-2">
-            Symptoms
-            <FaNotesMedical />
-          </h3>
-          <p>{""}</p>
+          {lastSymptoms.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-medium mb-2">
+                <span>Last Recorded Symptoms <span><FaNotesMedical /></span></span>
+              </h3>
+              <ul className="list-disc pl-5">
+                {lastSymptoms.map((symptom, index) => (
+                  <li key={index}>{symptom}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
         <div className="flex flex space-x-4">
           <Link

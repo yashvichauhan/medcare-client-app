@@ -1,10 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import * as tf from "@tensorflow/tfjs";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
+import { AuthContext } from "../Context/AuthContext";
+import { gql, useMutation } from "@apollo/client";
+import {toast} from 'react-toastify';
 
 export default function SymptomChecklistForm() {
+  // Define mutation
+  const RECORD_SYMPTOMS = gql`
+    mutation RecordSymptoms($patientId: String!, $symptomsList: [String]!) {
+      recordSymptoms(patientId: $patientId, symptomsList: $symptomsList) {
+        id
+        patientId
+        symptomsList
+      }
+    }
+  `;
+  const [recordSymptomsMutation] = useMutation(RECORD_SYMPTOMS);
   const [model, setModel] = useState(null);
+  const { loginData } = useContext(AuthContext);
   const [prediction, setPrediction] = useState("");
   const [symptoms, setSymptoms] = useState({
     feverChills: false,
@@ -112,8 +127,23 @@ export default function SymptomChecklistForm() {
   };
 
   // Function to handle form submission
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    const selectedSymptoms = Object.entries(symptoms)
+      .filter(([_, value]) => value)
+      .map(([key, _]) => key);
+
+    try {
+      const { data } = await recordSymptomsMutation({
+        variables: { patientId: loginData.id, symptomsList: selectedSymptoms },
+      });
+      console.log("Symptoms recorded:", data.recordSymptoms);
+      toast.success("Symtoms added successfully!");
+    } catch (error) {
+      console.error("Error recording symptoms:", error);
+      toast.error("Some error occurred during adding symptoms!")
+    }
+    //predict
     predict();
   };
 
@@ -158,6 +188,13 @@ export default function SymptomChecklistForm() {
                   className="w-50 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Reset
+                </button>
+                <button
+                  type="reset"
+                  onClick={()=> navigate("/patient-dashboard")}
+                  className="w-50 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Return to Dashboard
                 </button>
               </div>
 

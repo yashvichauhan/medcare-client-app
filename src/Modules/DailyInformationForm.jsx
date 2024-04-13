@@ -10,6 +10,8 @@ import Header from "./Header";
 import { gql, useMutation } from "@apollo/client";
 import { AuthContext } from "../Context/AuthContext";
 import { useContext } from "react";
+import {useNavigate} from 'react-router-dom';
+import { toast } from "react-toastify";
 
 export default function DailyInformationForm() {
   const RECORD_DAILY_INFO = gql`
@@ -39,6 +41,7 @@ export default function DailyInformationForm() {
       }
     }
   `;
+  const navigate = useNavigate();
   const [pulseRate, setPulseRate] = useState(70);
   const [bloodPressure, setBloodPressure] = useState("120/80");
   const [weight, setWeight] = useState(150);
@@ -68,8 +71,12 @@ export default function DailyInformationForm() {
       setWeight(150);
       setTemperature(98.6);
       setRespiratoryRate(18);
+      toast.success("Daily information recorded successfully!");
+      //naviagte back to dashboard
+      navigate("/patient-dashboard");
     } catch (error) {
       console.error("Error recording daily information:", error);
+      toast.error("Some error occurred please try again!");
     }
   };
 

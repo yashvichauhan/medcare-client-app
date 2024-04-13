@@ -7,7 +7,7 @@ import { AuthContext } from "../Context/AuthContext";
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [gender, setGender] = useState("");
+  const [gender, setGender] = useState("male");
   const [age, setAge] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("nurse");
