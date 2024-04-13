@@ -1,6 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaUserEdit, FaHeartbeat, FaThermometerHalf, FaWeight, FaLungs, FaNotesMedical } from 'react-icons/fa';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function PatientDashboard() {
     const patientData = {
@@ -15,6 +19,16 @@ export default function PatientDashboard() {
         respiratoryRate: 18,
         symptoms: "None",
     };
+
+    const { state } = useLocation();
+    
+    useEffect(() => {
+        
+        if(state != null){
+            toast.success("Predicted condition is " + state + ". Please consult a doctor.")
+       }
+      }, []);
+
 
     return (
         <div className="mx-auto mt-8 px-6 py-0 rounded-md">
@@ -71,6 +85,7 @@ export default function PatientDashboard() {
                 </Link>
             </div>
             <br></br>
+            <ToastContainer />  
         </div>
     );
 }
