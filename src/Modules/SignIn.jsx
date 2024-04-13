@@ -1,10 +1,13 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { AuthContext } from "../Context/AuthContext";
 
 export default function SignIn(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { setLogin } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -15,10 +18,14 @@ export default function SignIn(){
                 email,
                 password
             });
-            console.log("Login successful:", response.data);
+            if(response && response.data){
+                localStorage.setItem('token', response.data.token);
+                setLogin(response.data);
+            }
             
-            const { roleId } = response.data;
+            toast.success("Login successful!");
 
+            const { roleId } = response.data;
             switch (roleId) {
                 case "nurse":
                     navigate("/nurse-dashboard");
@@ -31,7 +38,8 @@ export default function SignIn(){
             }
         } catch (error) {
         // Handle login error
-        console.error("Login error:", error.response.data.message);
+            console.error("Login error:", error.response.data.message);
+            toast.error(error.response.data.message);
         }
     }
 
@@ -75,9 +83,6 @@ export default function SignIn(){
                     Password
                     </label>
                     <div className="text-sm">
-                    <a href="/" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                        Forgot password?
-                    </a>
                     </div>
                 </div>
                 <div className="mt-2">
