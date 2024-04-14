@@ -20,7 +20,7 @@ export default function SignUp() {
     try {
       const roleId = role === "nurse" ? "nurse" : "patient";
       const response = await axios.post(
-        "http://localhost:4000/api/auth/register",
+        "https://medcare-server.onrender.com/api/auth/register",
         {
           email,
           password,

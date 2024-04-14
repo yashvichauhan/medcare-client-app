@@ -14,7 +14,7 @@ export default function SignIn(){
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.post("http://localhost:4000/api/auth/login", {
+            const response = await axios.post("https://medcare-server.onrender.com/api/auth/login", {
                 email,
                 password
             });
