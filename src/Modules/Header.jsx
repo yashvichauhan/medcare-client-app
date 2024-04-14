@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {useNavigate} from 'react-router-dom';
 import { Dialog } from "@headlessui/react";
+import logo from '../images/logo.jpg';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -21,7 +22,7 @@ export default function Header() {
             <span className="sr-only">MedCare</span>
             <img
               className="h-8 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+              src={logo}
               alt=""
             />
           </a>

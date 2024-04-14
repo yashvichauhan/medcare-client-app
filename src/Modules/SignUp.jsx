@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {toast} from 'react-toastify';
 import { AuthContext } from "../Context/AuthContext";
+import logo from '../images/logo.jpg';
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
@@ -65,7 +66,7 @@ export default function SignUp() {
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-10 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+            src={logo}
             alt="Your Company"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
