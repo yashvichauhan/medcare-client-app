@@ -22,9 +22,6 @@ export default function SignIn(){
                 localStorage.setItem('token', response.data.token);
                 setLogin(response.data);
             }
-            
-            toast.success("Login successful!");
-
             const { roleId } = response.data;
             switch (roleId) {
                 case "nurse":
