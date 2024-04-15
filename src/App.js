@@ -34,7 +34,7 @@ function App() {
           <Route path="/daily-information" element={<DailyInformationForm/>} />
           <Route path="/patient-dashboard" element={<PatientDashboard/>} />
           <Route path="/symptom-checklist" element={<SymptomChecklistForm/>} />
-          <Route path="/previous-visit" element={<PreviousVisitsPage/>} />
+          <Route path="/previous-visit/:id" element={<PreviousVisitsPage/>} />
         </Route>
     </Routes>
     </>

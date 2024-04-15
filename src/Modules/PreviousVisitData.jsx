@@ -1,66 +1,145 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext } from "react";
+import { useEffect } from "react";
+import { gql, useQuery } from "@apollo/client";
+import { toast } from "react-toastify";
+import Header from "./Header";
+import { AuthContext } from "../Context/AuthContext";
+import { useLocation, useParams } from "react-router-dom";
 
-export default function PreviousVisitsPage({ patientId }) {
-    const [previousVisits, setPreviousVisits] = useState([]);
 
-    // Mock function to simulate fetching previous visits for a patient
-    const fetchPreviousVisitsForPatient = async (patientId) => {
-        // Dummy data for previous visits
-        const dummyData = [
-            { patientName: "Patient 1", bodyTemperature: 98.6, heartRate: 70, bloodPressure: "120/80", respiratoryRate: 18 },
-            { patientName: "Patient 1", bodyTemperature: 99.2, heartRate: 75, bloodPressure: "130/85", respiratoryRate: 20 }
-        ];
-        // Simulate API call delay with setTimeout
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(dummyData);
-            }, 1000);
-        });
-    };
+export default function PreviousVisitsPage(props) {
+  const { loginData } = useContext(AuthContext);
+  let { id } = useParams();
+  console.log("Testing Id " + id);
 
-    // Fetch previous visits for the patient
-    useEffect(() => {
-        const fetchPreviousVisits = async () => {
-            try {
-                // Fetch previous visits data for the patientId
-                const data = await fetchPreviousVisitsForPatient(patientId);
-                // Update state with fetched data
-                setPreviousVisits(data);
-            } catch (error) {
-                console.error("Error fetching previous visits:", error);
-            }
-        };
+  const GET_PATIENT_INFO = gql`
+    query getPatientInfoById($id: String!) {
+      getPatientInfoById(patientId: $id) {
+        id
+        name
+        email
+        gender
+        roleId
+        age
+      }
+    }
+  `;
 
-        fetchPreviousVisits();
-    }, [patientId]);
+  const GET_VITAL_SIGNS_BY_NURSE_ID = gql`
+    query GetVitalSignsByNurseId($nurseId: String!) {
+      getVitalSignsByNurseId(nurseId: $nurseId) {
+        id
+        patientId
+        createdAt
+        bloodPressure
+        bodyTemperature
+        heartRate
+        respiratoryRate
+      }
+    }
+  `;
 
-    return (
-        <div className="container mx-auto px-4 py-3">
-            <h1 className="text-3xl font-semibold text-gray-800 mb-4">Previous Visits</h1>
-            <div className="overflow-x-auto">
-                <table className="w-full border-collapse table-auto">
-                    <thead>
-                        <tr>
-                            <th className="px-4 py-2 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Patient Name</th>
-                            <th className="px-4 py-2 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Body Temperature (°F)</th>
-                            <th className="px-4 py-2 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Heart Rate (bpm)</th>
-                            <th className="px-4 py-2 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Blood Pressure (mmHg)</th>
-                            <th className="px-4 py-2 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Respiratory Rate (bpm)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {previousVisits.map((visit, index) => (
-                            <tr key={index}>
-                                <td className="border px-4 py-2">{visit.patientName}</td>
-                                <td className="border px-4 py-2">{visit.bodyTemperature}</td>
-                                <td className="border px-4 py-2">{visit.heartRate}</td>
-                                <td className="border px-4 py-2">{visit.bloodPressure}</td>
-                                <td className="border px-4 py-2">{visit.respiratoryRate}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+  const {
+    loading: loadingData,
+    error: errorData,
+    data: dataData,
+    refetch: refetchData,
+  } = useQuery(GET_VITAL_SIGNS_BY_NURSE_ID, {
+    variables: { nurseId: loginData.id, patientId: id },
+  });
+
+  const { loading, error, data } = useQuery(GET_PATIENT_INFO, {
+    variables: { id: id },
+  });
+
+  useEffect(() => {
+    refetchData();
+  }, [id]);
+
+  if (loading) return "Loading...";
+  if (error) return `Error! ${error.message}`;
+
+  const patientInfo = data.getPatientInfoById;
+
+  const vitalSigns = dataData.getVitalSignsByNurseId;
+
+  return (
+    <div className="container mx-auto px-4 py-3">
+      <Header />
+      <h1 className="text-3xl font-semibold text-gray-800 mb-4">
+        Previous Visits
+      </h1>
+      <div className="flex justify-between mb-4">
+        <h3 className="text-lg font-medium text-blue-600">Patient Details</h3>
+      </div>
+      <div>
+        {patientInfo && (
+          <div className="grid grid-cols-8 gap-y-2">
+            <div>
+              <p className="text-sm text-gray-600">Name:</p>
+              <p>{patientInfo.name}</p>
             </div>
-        </div>
-    );
+            <div>
+              <p className="text-sm text-gray-600">Age:</p>
+              <p>{patientInfo.age}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Email:</p>
+              <p>{patientInfo.email}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Gender:</p>
+              <p>{patientInfo.gender}</p>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="mt-8">
+        <h3 className="text-lg font-medium text-blue-600">Vital Signs</h3>
+        <table className="table-auto w-full mt-4 border-collapse border border-gray-200">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 border border-gray-200 bg-gray-100">
+                Date
+              </th>
+              <th className="px-4 py-2 border border-gray-200 bg-gray-100">
+                Blood Pressure
+              </th>
+              <th className="px-4 py-2 border border-gray-200 bg-gray-100">
+                Body Temperature
+              </th>
+              <th className="px-4 py-2 border border-gray-200 bg-gray-100">
+                Heart Rate
+              </th>
+              <th className="px-4 py-2 border border-gray-200 bg-gray-100">
+                Respiratory Rate
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {vitalSigns?.map((sign) => (
+              <tr key={sign.id}>
+                <td className="px-4 py-2 border border-gray-200">
+                {sign.createdAt ? new Date(Number(sign.createdAt)).toLocaleDateString() : 'N/A'}
+
+                </td>
+                <td className="px-4 py-2 border border-gray-200">
+                  {sign.bloodPressure}
+                </td>
+                <td className="px-4 py-2 border border-gray-200">
+                  {sign.bodyTemperature}
+                </td>
+                <td className="px-4 py-2 border border-gray-200">
+                  {sign.heartRate}
+                </td>
+                <td className="px-4 py-2 border border-gray-200">
+                  {sign.respiratoryRate}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
