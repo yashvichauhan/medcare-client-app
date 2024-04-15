@@ -11,7 +11,7 @@ import { ApolloProvider } from '@apollo/client';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 const client = new ApolloClient({
-  uri: 'http://localhost:4000/graphql',
+  uri: 'https://medcare-server.onrender.com/graphql',
   cache: new InMemoryCache()
 });
 
