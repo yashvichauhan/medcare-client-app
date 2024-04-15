@@ -4,13 +4,14 @@ import { gql, useQuery } from "@apollo/client";
 import { toast } from "react-toastify";
 import Header from "./Header";
 import { AuthContext } from "../Context/AuthContext";
-import { useLocation, useParams } from "react-router-dom";
-
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 
 export default function PreviousVisitsPage(props) {
   const { loginData } = useContext(AuthContext);
   let { id } = useParams();
   console.log("Testing Id " + id);
+
+  const navigate = useNavigate();
 
   const GET_PATIENT_INFO = gql`
     query getPatientInfoById($id: String!) {
@@ -120,8 +121,9 @@ export default function PreviousVisitsPage(props) {
             {vitalSigns?.map((sign) => (
               <tr key={sign.id}>
                 <td className="px-4 py-2 border border-gray-200">
-                {sign.createdAt ? new Date(Number(sign.createdAt)).toLocaleDateString() : 'N/A'}
-
+                  {sign.createdAt
+                    ? new Date(Number(sign.createdAt)).toLocaleDateString()
+                    : "N/A"}
                 </td>
                 <td className="px-4 py-2 border border-gray-200">
                   {sign.bloodPressure}
@@ -139,6 +141,15 @@ export default function PreviousVisitsPage(props) {
             ))}
           </tbody>
         </table>
+      </div>
+      <div>
+        <button
+          type="reset"
+          onClick={() => navigate("/nurse-dashboard")}
+          className="w-50 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Return to Dashboard
+        </button>
       </div>
     </div>
   );
